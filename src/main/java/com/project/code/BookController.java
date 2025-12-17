@@ -2,7 +2,11 @@ package com.project.code;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,10 +17,18 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
+
+    private final BookValidator bookValidator = new BookValidator();
+
     // Create a new book
-    
     @PostMapping("/addBook")
-    public ResponseEntity<Book> createBook(@RequestBody Book book) {
+    public ResponseEntity<Object> createBook(@Valid @RequestBody Book book, BindingResult result) {
+        bookValidator.validate(book, result);
+        
+        if (result.hasErrors()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Validation failed: " + result.getAllErrors());
+        }
+
         Book savedBook = bookService.saveBook(book);
         return ResponseEntity.ok(savedBook);
     }

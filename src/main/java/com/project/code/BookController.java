@@ -59,4 +59,11 @@ public class BookController {
         bookService.deleteBook(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/createBookResponse")
+    public ResponseEntity<ApiResponse<Book>> createBookResponse(@RequestBody Book book) {
+        Book savedBook = bookService.saveBook(book);
+        ApiResponse<Book> response = new ApiResponse<>("success", "Book created successfully", savedBook);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 }
